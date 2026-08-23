@@ -1,0 +1,32 @@
+# --- Secrets ---
+.env
+.env.local
+
+# --- Virtualenvs / build caches ---
+.venv/
+.manim-pkgconfig/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# --- Local databases ---
+*.db
+
+# --- Generated lessons & demo assets (large media, not source) ---
+projects/*
+!projects/.gitkeep
+
+# --- Exasol runtime dir (local launcher data) ---
+exasol/
+
+# --- Large inputs / render output ---
+data/ncert/**/*.pdf
+data/ncert/**/*.partial
+evaluation/
+media/
+
+# --- macOS ---
+.DS_Store

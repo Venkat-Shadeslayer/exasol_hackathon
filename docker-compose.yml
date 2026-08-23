@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: scholarmotion
+      POSTGRES_USER: scholarmotion
+      POSTGRES_PASSWORD: scholarmotion
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scholarmotion"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes: ["redis_data:/data"]
+    ports: ["6379:6379"]
+  # Exasol Personal — the analytical platform holding the source corpus.
+  # The docker-db image needs privileged mode for its own storage layer and is
+  # slow to first-start; the healthcheck gates the api/worker on it.
+  exasol:
+    image: exasol/docker-db:2025.1.14
+    privileged: true
+    shm_size: 2gb
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8563 || nc -z localhost 8563"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 300s
+    volumes: ["exasol_data:/exa"]
+    ports: ["8563:8563", "2580:2580"]
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniosecret
+    volumes: ["minio_data:/data"]
+    ports: ["9000:9000", "9001:9001"]
+  api:
+    build: .
+    env_file: .env
+    environment:
+      EXASOL_DSN: exasol:8563
+    command: uvicorn scholarmotion.api.main:app --host 0.0.0.0 --port 8000
+    volumes: ["./projects:/app/projects", "./data:/app/data", "./knowledge:/app/knowledge"]
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      exasol: {condition: service_healthy}
+  worker:
+    build: .
+    env_file: .env
+    environment:
+      EXASOL_DSN: exasol:8563
+    command: celery -A scholarmotion.tasks.celery_app worker -l info -Q planning,retrieval,code_generation,tts,render,verification,assembly,feedback --concurrency=4
+    volumes: ["./projects:/app/projects", "./data:/app/data:ro", "./knowledge:/app/knowledge"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      exasol: {condition: service_healthy}
+  frontend:
+    build: .
+    env_file: .env
+    command: streamlit run frontend/app.py --server.address 0.0.0.0 --server.port 8501
+    ports: ["8501:8501"]
+    depends_on: ["api"]
+volumes:
+  exasol_data:
+  postgres_data:
+  redis_data:
+  minio_data:

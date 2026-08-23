@@ -292,6 +292,17 @@ the scene table's render-version column shows which scenes changed and which wer
 `MAX_CONCURRENT_SCENES=1 MAX_LLM_REQUESTS=1` keeps you inside Gemini's free-tier limit of 15
 requests per minute. Raise them if you have a paid key.
 
+## Inspecting an edit
+
+After a timestamp edit, see exactly what changed:
+
+```bash
+python scripts/show_edit_diff.py <project-id>   # omit the id for the newest project
+```
+
+`UNTOUCHED` scenes kept their narration and render; `REGENERATED` scenes show the
+before/after narration text and carry a second audio take.
+
 ## First end-to-end run
 
 ### Fastest: a scripted demo

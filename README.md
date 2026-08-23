@@ -269,6 +269,19 @@ Before submitting it tells you which scenes overlap that window. After the rebui
 compare render versions in the same table — the scenes outside your range keep their old version
 number, which is the selective regeneration made visible.
 
+### Proving what changed
+
+Video length is weak evidence. To show the *content* difference:
+
+```bash
+python scripts/show_edit_diff.py <project-id>
+```
+
+It prints, per scene, whether the narration was left byte-for-byte identical or
+rewritten — and for the rewritten scenes, the old and new text side by side. Scenes
+outside the edited range report `UNTOUCHED` with a single audio take; scenes inside
+report `REGENERATED` with two.
+
 ### From the API
 
 The equivalent API call:

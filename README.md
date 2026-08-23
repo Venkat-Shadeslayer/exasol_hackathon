@@ -6,7 +6,18 @@ Its unit of work is a small, immutable **scene artifact** — not one monolithic
 
 The repository runs end-to-end **without any API keys** in deterministic mock mode. Production mode uses PostgreSQL/pgvector, Redis/Celery, Manim, FFmpeg, and pluggable LLM/TTS/embedding/storage providers.
 
-➡️ **New here? Start with the [Run Guide](RUN_GUIDE.md).** It has copy-pasteable setup for both Docker and local Python, plus troubleshooting.
+---
+
+## Submission materials
+
+Everything for this submission lives in this repository, plus one hosted recording:
+
+| | What it is |
+|---|---|
+| 📄 **[README.md](README.md)** | This document — architecture, the Exasol data platform, and how retrieval is pushed into the database. |
+| 🛠️ **[RUN_GUIDE.md](RUN_GUIDE.md)** | Copy-pasteable setup for both Docker and local Python, plus troubleshooting. **Start here.** |
+| 📊 **[Slides](ScholarMotion_Exasol_Hackathon.pdf)** | Presentation deck (PDF). |
+| 📹 **[Video recording](https://drive.google.com/file/d/1YOe2v-PkURsFBGM8P50BJUI6OpTKLMtx/view?usp=sharing)** | Recorded walkthrough of the system running end to end. |
 
 ---
 
